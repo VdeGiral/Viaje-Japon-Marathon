@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Japón 2026: La Guía Maestra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #FF385C; /* Rojo Airbnb/Moderno */
+            --bg: #F0F2F5;
+            --card-bg: #FFFFFF;
+            --text-main: #222222;
+            --text-sec: #717171;
+            --accent-blue: #008489;
+            --accent-gold: #FFD700;
+            --radius: 24px;
+            --shadow-soft: 0 6px 16px rgba(0,0,0,0.08);
+            --shadow-hover: 0 12px 32px rgba(0,0,0,0.12);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding-bottom: 100px;
+        }
+
+        /* --- HERO HEADER --- */
+        header {
+            height: 360px;
+            background-image: url('https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding: 25px;
+            border-bottom-left-radius: 35px;
+            border-bottom-right-radius: 35px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        header::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 10%, transparent 60%);
+        }
+
+        .header-content { position: relative; z-index: 2; width: 100%; color: white; }
+        
+        .tag-pill {
+            background: white; color: black; padding: 5px 12px; 
+            border-radius: 20px; font-size: 0.75rem; font-weight: 800;
+            display: inline-block; margin-bottom: 10px; text-transform: uppercase;
+        }
+
+        h1 { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; font-size: 3rem; line-height: 1; }
+        .subtitle { font-size: 1rem; opacity: 0.9; margin-top: 5px; font-weight: 500; }
+
+        /* --- COUNTDOWN TIMER --- */
+        .countdown-container {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            padding: 10px 20px;
+            border-radius: 16px;
+            margin-top: 15px;
+            display: inline-block;
+        }
+        .countdown-timer { display: flex; gap: 15px; text-align: center; }
+        .countdown-item {
+            font-size: 1.5rem; font-weight: 700; line-height: 1.1;
+        }
+        .countdown-item span { display: block; font-size: 0.6rem; font-weight: 500; text-transform: uppercase; opacity: 0.8; }
+
+
+        /* --- CONTENEDOR --- */
+        .container { max-width: 800px; margin: -40px auto 0; padding: 0 15px; position: relative; z-index: 10; }
+
+        /* --- SELECTOR DE MOOD --- */
+        .mood-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 25px;
+        }
+        .section-header {
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #888; font-weight: 700; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .mood-scroller {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+        .mood-scroller::-webkit-scrollbar { display: none; }
+
+        .mood-btn {
+            min-width: 80px;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            padding: 12px 8px;
+            background: #f7f7f7; border: 2px solid transparent;
+            border-radius: 16px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mood-btn span { font-size: 1.5rem; }
+        .mood-btn div { font-size: 0.7rem; font-weight: 700; color: #555; }
+
+        .mood-btn.active {
+            background: #fff0f3; border-color: var(--primary);
+            transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 56, 92, 0.2);
+        }
+        .mood-btn.active div { color: var(--primary); }
+
+        /* --- TARJETAS DE DÍA --- */
+        .day-card {
+            background: white; border-radius: var(--radius);
+            overflow: hidden; margin-bottom: 25px;
+            box-shadow: var(--shadow-soft);
+            animation: slideUp 0.4s ease-out forwards;
+            opacity: 0; transform: translateY(20px);
+        }
+
+        .day-visual {
+            height: 180px; position: relative;
+        }
+        .day-visual img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .date-float {
+            position: absolute; top: 15px; left: 15px;
+            background: rgba(255,255,255,0.9); backdrop-filter: blur(4px);
+            padding: 6px 12px; border-radius: 12px;
+            text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .df-num { display: block; font-size: 1.2rem; font-weight: 900; color: var(--text-main); line-height: 1; }
+        .df-mon { font-size: 0.65rem; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+
+        .day-body { padding: 20px; }
+        
+        .day-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        h3 { margin: 0; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; }
+        .city-badge { 
+            font-size: 0.7rem; background: #eee; padding: 4px 8px; border-radius: 6px; 
+            font-weight: 700; color: #666; text-transform: uppercase;
+        }
+
+        .day-meta-info {
+            display: flex; flex-wrap: wrap; gap: 15px; font-size: 0.8rem; color: var(--text-sec);
+            margin-bottom: 15px; border-top: 1px solid #f0f0f0;
+            padding-top: 15px;
+        }
+        .meta-item { font-weight: 600; }
+        .meta-item span { font-weight: 400; }
+
+        p.desc { color: var(--text-sec); font-size: 0.9rem; margin: 0 0 15px 0; line-height: 1.5; }
+
+        /* --- LISTA DE LINKS (GOOGLE MAPS) --- */
+        .acts-container {
+            display: grid; gap: 8px;
+        }
+
+        .time-block {
+            border-left: 3px solid #eee; padding-left: 12px; margin-bottom: 5px;
+        }
+        .time-label { font-size: 0.7rem; font-weight: 800; color: #aaa; text-transform: uppercase; margin-bottom: 4px; display: block; }
+
+        .map-link {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #f8f9fa; padding: 10px 14px;
+            border-radius: 12px; text-decoration: none;
+            color: var(--text-main); font-size: 0.9rem; font-weight: 500;
+            transition: transform 0.1s, background 0.1s;
+            border: 1px solid transparent;
+            margin-bottom: 6px;
+        }
+        .map-link:hover { background: white; border-color: #ddd; transform: scale(1.01); }
+        .map-link span { display: flex; align-items: center; gap: 8px; }
+        .icon-map { font-size: 1rem; }
+        .arrow-icon { color: var(--primary); font-weight: 900; font-size: 1.1rem; }
+
+        /* Footer */
+        .notes-container {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .notes-container > label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #aaa;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .notes-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .note-item { background: #f8f9fa; padding: 10px 14px; border-radius: 12px; }
+        .note-author { font-size: 0.8rem; margin-right: 5px; }
+        .note-text { font-size: 0.9rem; margin: 0; display: inline; white-space: pre-wrap; }
+
+        /* Colores para usuarios */
+        .author-Victor { color: #007bff; }
+        .author-Belen { color: #ff385c; }
+        .author-Irene { color: #28a745; }
+        .author-Felix { color: #fd7e14; }
+
+        .add-note-form { display: flex; flex-wrap: wrap; gap: 10px; }
+        .note-user-select {
+            flex-basis: 120px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background-color: white;
+            font-weight: 600;
+        }
+        .notes-textarea {
+            flex: 1;
+            min-width: 200px;
+            min-height: 40px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            padding: 8px 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            resize: vertical;
+            background-color: white;
+            transition: all 0.2s;
+        }
+        .notes-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 56, 92, 0.15);
+        }
+        .add-note-btn {
+            flex-basis: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-grow: 1;
+        }
+        .add-note-btn:hover { background-color: #e01e42; }
+
+        .fab-refresh {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--text-main); color: white;
+            padding: 12px 25px; border-radius: 50px;
+            font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: none; cursor: pointer; z-index: 100;
+            display: flex; gap: 8px; align-items: center;
+        }
+
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+        <div class="tag-pill">🇯🇵 Japón 2026</div>
+        <h1>Tu Viaje</h1>
+        <div class="subtitle">Itinerario Inteligente con Google Maps</div>
+        <div class="countdown-container">
+            <div id="countdown" class="countdown-timer">
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    
+    <div class="mood-card">
+        <div class="section-header">
+            <span>🎨 Estilo para días libres (Tokyo/Kyoto)</span>
+        </div>
+        <div class="mood-scroller">
+            <div class="mood-btn active" onclick="changeMood('relax', this)">
+                <span>🍃</span><div>Relax</div>
+            </div>
+            <div class="mood-btn" onclick="changeMood('iconos', this)">
+                <span>🗼</span><div>Iconos</div>
+            </div>
+            <div class="mood-btn" onclick="changeMood('movido', this)">
+                <span>👟</span><div>Movido</div>
+            </div>
+            <div class="mood-btn" onclick="changeMood('foodie', this)">
+                <span>🍜</span><div>Foodie</div>
+            </div>
+            <div class="mood-btn" onclick="changeMood('templos', this)">
+                <span>⛩️</span><div>Templos</div>
+            </div>
+            <div class="mood-btn" onclick="changeMood('otaku', this)">
+                <span>👾</span><div>Otaku</div>
+            </div>
+            <div class="mood-btn" onclick="changeMood('arte', this)">
+                <span>🏛️</span><div>Arte</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="itinerary-feed"></div>
+
+</div>
+
+<button class="fab-refresh" onclick="window.scrollTo({top:0, behavior:'smooth'})">⬆ Volver Arriba</button>
+
+<script>
+    // --- COUNTDOWN TIMER ---
+    function startCountdown() {
+        const countdownEl = document.getElementById('countdown');
+        const tripStartDate = new Date('2026-02-25T00:00:00').getTime();
+
+        const updateTimer = () => {
+            const now = new Date().getTime();
+            const distance = tripStartDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdownEl.innerHTML = `
+                <div class="countdown-item">${days}<span>Días</span></div>
+                <div class="countdown-item">${hours}<span>Horas</span></div>
+                <div class="countdown-item">${minutes}<span>Min</span></div>
+                <div class="countdown-item">${seconds}<span>Seg</span></div>
+            `;
+        };
+        updateTimer(); // Initial call
+        setInterval(updateTimer, 1000);
+    }
+
+    // ESTADO INICIAL
+    let currentMood = 'relax';
+
+    // --- BASE DE DATOS DE IMÁGENES ---
+    const imgDB = {
+        arrival: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=800&auto=format&fit=crop",
+        asakusa: "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?q=80&w=800&auto=format&fit=crop",
+        meiji: "https://images.unsplash.com/photo-1589463349208-9220675c5086?q=80&w=800&auto=format&fit=crop",
+        marathon: "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?q=80&w=800&auto=format&fit=crop",
+        
+        // Variaciones Tokyo
+        tokyo_relax: "https://images.unsplash.com/photo-1554797589-7241bb691973?q=80&w=800&auto=format&fit=crop",
+        tokyo_icon: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=800&auto=format&fit=crop",
+        tokyo_movido: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=800&auto=format&fit=crop",
+        tokyo_food: "https://images.unsplash.com/photo-1519982785331-9ab36914883e?q=80&w=800&auto=format&fit=crop",
+        tokyo_temple: "https://images.unsplash.com/photo-1590598394268-1615509965e1?q=80&w=800&auto=format&fit=crop",
+        tokyo_otaku: "https://images.unsplash.com/photo-1613487957484-32c977a84b5f?q=80&w=800&auto=format&fit=crop",
+        tokyo_art: "https://images.unsplash.com/photo-1536922246202-993b21a0b766?q=80&w=800&auto=format&fit=crop",
+
+        hakone: "https://images.unsplash.com/photo-1578469645742-46cae010e5d4?q=80&w=800&auto=format&fit=crop",
+        fushimi: "https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?q=80&w=800&auto=format&fit=crop",
+        
+        // Variaciones Kyoto
+        kyoto_relax: "https://images.unsplash.com/photo-1624253321171-1be53e12f5f4?q=80&w=800&auto=format&fit=crop",
+        kyoto_icon: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop",
+        kyoto_movido: "https://images.unsplash.com/photo-1597735672926-6282837b5156?q=80&w=800&auto=format&fit=crop",
+        kyoto_food: "https://images.unsplash.com/photo-1559305168-6260c723df39?q=80&w=800&auto=format&fit=crop",
+        kyoto_temple: "https://images.unsplash.com/photo-1605218458283-0c5cb6d02c47?q=80&w=800&auto=format&fit=crop",
+        kyoto_otaku: "https://images.unsplash.com/photo-1611905801936-599f3880d1b1?q=80&w=800&auto=format&fit=crop",
+        kyoto_art: "https://images.unsplash.com/photo-1588523999964-43b51b3816d3?q=80&w=800&auto=format&fit=crop",
+
+        nara: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Omizutori_1.jpg/800px-Omizutori_1.jpg",
+        osaka: "https://images.unsplash.com/photo-1590559899731-a382839e5549?q=80&w=800&auto=format&fit=crop"
+    };
+
+    // --- CONTENIDO DINÁMICO ---
+    const dynamicPlans = {
+        relax: {
+            tokyo: {
+                title: "Tokyo: Jardines & Compras Lentas",
+                img: imgDB.tokyo_relax,
+                transportCost: "¥1000",
+                transportHours: "~2h",
+                morning: ["Jardín Shinjuku Gyoen", "Cafetería Blue Bottle Shinjuku"],
+                afternoon: ["Ginza Six (Arquitectura)", "Uniqlo Ginza (12 Pisos)", "Palacio Imperial (Jardines Este)"],
+                night: ["Cena en Yurakucho", "Paseo nocturno Estación Tokyo"]
+            },
+            kyoto: {
+                title: "Kyoto Zen & Filosofía",
+                img: imgDB.kyoto_relax,
+                transportCost: "¥1200",
+                transportHours: "~2.5h",
+                morning: ["Paseo del Filósofo", "Templo Ginkaku-ji (Plata)"],
+                afternoon: ["Té Matcha en Ippodo Tea", "Templo Nanzen-ji (Acueducto)", "Jardín de Piedras Ryoan-ji"],
+                night: ["Cena tranquila en Gion Norte"]
+            }
+        },
+        iconos: {
+            tokyo: {
+                title: "Tokyo: Los Imperdibles",
+                img: imgDB.tokyo_icon,
+                transportCost: "¥1500",
+                transportHours: "~2.5h",
+                morning: ["Cruce de Shibuya (Hachiko)", "Torre de Tokyo (Zojoji View)"],
+                afternoon: ["Shibuya Sky (Reservar)", "Omotesando Hills", "Harajuku Takeshita St"],
+                night: ["Roppongi Hills Mori Tower", "Luces de Shinjuku"]
+            },
+            kyoto: {
+                title: "Kyoto: La Foto Perfecta",
+                img: imgDB.kyoto_icon,
+                transportCost: "¥1500",
+                transportHours: "~3h",
+                morning: ["Bosque de Bambú Arashiyama", "Puente Togetsukyo"],
+                afternoon: ["Kinkaku-ji (Pabellón Dorado)", "Callejón Pontocho (Geishas)", "Yasaka Pagoda"],
+                night: ["Santuario Yasaka Iluminado"]
+            }
+        },
+        movido: {
+            tokyo: {
+                title: "Tokyo: Acción & Futuro",
+                img: imgDB.tokyo_movido,
+                transportCost: "¥1800",
+                transportHours: "~3h",
+                morning: ["TeamLab Planets (Mojarse)", "Mercado Toyosu (Atún)"],
+                afternoon: ["Akihabara (Electric Town)", "Radio Kaikan (Figuras)", "Nakano Broadway (Retro)"],
+                night: ["Batting Center Shinjuku", "Karaoke Kan Shibuya"]
+            },
+            kyoto: {
+                title: "Kyoto: Caminatas Épicas",
+                img: imgDB.kyoto_movido,
+                transportCost: "¥1500",
+                transportHours: "~3h",
+                morning: ["Monkey Park Iwatayama (Subida)", "Templo Tenryu-ji"],
+                afternoon: ["Castillo Nijo (Suelos ruiseñor)", "Subida completa al Monte Inari (2h)", "Mercado Nishiki"],
+                night: ["Paseo Río Kamo", "Torre de Kyoto"]
+            }
+        },
+        foodie: {
+            tokyo: {
+                title: "Tokyo: Ruta Gastronómica",
+                img: imgDB.tokyo_food,
+                transportCost: "¥1200",
+                transportHours: "~2.5h",
+                morning: ["Tsukiji Outer Market (Sushi desayuno)", "Tamagoyaki (Tortilla)"],
+                afternoon: ["Kappabashi (Utensilios cocina)", "Ameyoko Market (Comida callejera)", "Depachika (Comida Corte Inglés Japonés)"],
+                night: ["Omoide Yokocho (Yakitori)", "Golden Gai (Copas)"]
+            },
+            kyoto: {
+                title: "Kyoto: Sabores Tradicionales",
+                img: imgDB.kyoto_food,
+                transportCost: "¥1000",
+                transportHours: "~2h",
+                morning: ["Mercado Nishiki (El 'Cocina' de Kyoto)", "Pickles y Tofu"],
+                afternoon: ["Barrio del Sake (Fushimi)", "Museo Gekkeikan Okura Sake", "Dulces Yatsuhashi"],
+                night: ["Cena Kaiseki (Alta cocina)", "Ramen Alley Kyoto"]
+            }
+        },
+        templos: {
+            tokyo: {
+                title: "Tokyo: Espiritual",
+                img: imgDB.tokyo_temple,
+                transportCost: "¥1500",
+                transportHours: "~3h",
+                morning: ["Santuario Nezu (Torii Túnel)", "Templo Kanda Myoujin"],
+                afternoon: ["Templo Gotokuji (Cuna del gato maneki-neko)", "Sengaku-ji (47 Ronin)"],
+                night: ["Santuario Hie (Escaleras iluminadas)"]
+            },
+            kyoto: {
+                title: "Kyoto: Los Grandes Templos",
+                img: imgDB.kyoto_temple,
+                transportCost: "¥1200",
+                transportHours: "~2h",
+                morning: ["Kiyomizu-dera (Agua Pura)", "Sanjusangendo (1001 Budas)"],
+                afternoon: ["Eikan-do Zenrin-ji", "Heian Jingu (Torii Gigante)", "Kodai-ji"],
+                night: ["Shoren-in (Iluminación nocturna si hay)"]
+            }
+        },
+        otaku: {
+            tokyo: {
+                title: "Tokyo: Inmersión Otaku",
+                img: imgDB.tokyo_otaku,
+                transportCost: "¥1000",
+                transportHours: "~2h",
+                morning: ["Akihabara (Tiendas de electrónica y anime)", "Gachapon Hall", "Mandarake Complex"],
+                afternoon: ["Nakano Broadway (Meca del coleccionismo)", "Almuerzo en un Maid Cafe", "Ikebukuro (Animate, Sunshine City)"],
+                night: ["Karaoke en Shinjuku", "Arcades de SEGA/Taito", "Cena Ramen Ichiran"]
+            },
+            kyoto: {
+                title: "Kyoto: El Lado Friki",
+                img: imgDB.kyoto_otaku,
+                transportCost: "¥800",
+                transportHours: "~1.5h",
+                morning: ["Museo Internacional del Manga de Kyoto", "Teramachi Street (Tiendas)"],
+                afternoon: ["Nintendo Kyoto Store (Takashimaya)", "Pokemon Center Kyoto"],
+                night: ["Cena en Kyoto Ramen Koji (Estación de Kyoto)"]
+            }
+        },
+        arte: {
+            tokyo: {
+                title: "Tokyo: Arte y Diseño",
+                img: imgDB.tokyo_art,
+                transportCost: "¥1200",
+                transportHours: "~2.5h",
+                morning: ["Museo Nezu (Jardín y arte)", "21_21 Design Sight (Arquitectura Ando)"],
+                afternoon: ["The National Art Center, Tokyo", "Paseo por Daikanyama (Boutiques y diseño)", "Daikanyama T-Site (Librería)"],
+                night: ["Cena en Ebisu", "Museo de la Cerveza Yebisu"]
+            },
+            kyoto: {
+                title: "Kyoto: Artesanía y Galerías",
+                img: imgDB.kyoto_art,
+                transportCost: "¥1000",
+                transportHours: "~2h",
+                morning: ["Museo de Arte Kyocera", "Paseo por el canal Okazaki"],
+                afternoon: ["Kyoto Handicraft Center", "Visita a un taller de cerámica (Kiyomizu-yaki)"],
+                night: ["Galerías de arte en Gion", "Cena con vistas al río Kamo"]
+            }
+        }
+    };
+
+    function changeMood(mood, el) {
+        currentMood = mood;
+        document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
+        el.classList.add('active');
+        renderItinerary();
+    }
+
+    // Función para generar Link de Google Maps
+    function mapLink(place, city) {
+        const query = encodeURIComponent(`${place} ${city} Japan`);
+        const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
+        return `
+            <a href="${url}" target="_blank" class="map-link">
+                <span><span class="icon-map">📍</span> ${place}</span>
+                <span class="arrow-icon">›</span>
+            </a>
+        `;
+    }
+
+    // Función para guardar notas en localStorage
+    function addNote(dayId) {
+        try {
+            const userSelect = document.getElementById(`note-user-${dayId}`);
+            const textarea = document.getElementById(`note-input-${dayId}`);
+            const author = userSelect.value;
+            const text = textarea.value.trim();
+
+            if (!text) return; // No añadir notas vacías
+
+            const noteId = `note_${dayId}`;
+            const notes = JSON.parse(localStorage.getItem(noteId) || '[]');
+            
+            notes.push({ author, text });
+            localStorage.setItem(noteId, JSON.stringify(notes));
+
+            textarea.value = ''; // Limpiar textarea
+            renderNotes(dayId); // Volver a renderizar solo las notas de ese día
+        } catch (e) {
+            console.error("Error al guardar la nota (localStorage puede estar bloqueado):", e);
+            alert("No se pudo guardar la nota. Tu navegador podría estar bloqueando el almacenamiento local al abrir el archivo directamente.");
+        }
+    }
+
+    function renderNotes(dayId) {
+        const listEl = document.getElementById(`notes-list-${dayId}`);
+        if (!listEl) return;
+
+        try {
+            const noteId = `note_${dayId}`;
+            const notes = JSON.parse(localStorage.getItem(noteId) || '[]');
+            
+            if (notes.length === 0) {
+                listEl.innerHTML = '';
+                return;
+            }
+
+            listEl.innerHTML = notes.map(note => `
+                <div class="note-item">
+                    <strong class="note-author author-${note.author}">${note.author}:</strong>
+                    <p class="note-text">${note.text}</p>
+                </div>
+            `).join('');
+        } catch (e) {
+            console.error("Error al cargar las notas (localStorage puede estar bloqueado):", e);
+            // No hacemos nada en la UI para no ser intrusivos, el área de notas simplemente quedará vacía.
+        }
+    }
+
+
+
+    function renderItinerary() {
+        const feed = document.getElementById('itinerary-feed');
+        const tPlan = dynamicPlans[currentMood].tokyo;
+        const kPlan = dynamicPlans[currentMood].kyoto;
+
+        // Estructura de Datos Fija + Dinámica
+        const schedule = [
+            {
+                d: "26", m: "FEB", loc: "Tokyo", img: imgDB.arrival,
+                title: "Llegada a Shinjuku",
+                transportCost: "¥10k-25k (Taxi)",
+                transportHours: "~1.5h",
+                desc: "Llegas solo. Viaje directo en Taxi/Uber al apartamento en Kabukicho para instalarte y empezar a explorar la zona.",
+                blocks: {
+                    "Mañana/Tarde (Llegada)": ["Llegada Haneda/Narita", "Taxi o Uber a Shinjuku (2-2-21 Kabukicho)", "Check-in Apartamento"],
+                    "Tarde": ["Tokyo Big Sight (Expo Maratón)", "Explorar alrededores de Shinjuku"],
+                    "Noche": ["Cena en Omoide Yokocho ('Piss Alley')", "Vistas desde el Ayto. de Tokyo (Gratis)", "Paseo por Kabukicho (Godzilla Head)"]
+                }
+            },
+            {
+                d: "27", m: "FEB", loc: "Tokyo", img: imgDB.arrival,
+                title: "Tradición & Ciruelos",
+                transportCost: "¥1000",
+                transportHours: "~1.5h",
+                desc: "Día tranquilo. Visita el templo más antiguo y el festival de temporada.",
+                blocks: {
+                    "Mañana": ["Templo Senso-ji (Asakusa)", "Calle Nakamise-dori", "Centro Info Turística (Vistas gratis)"],
+                    "Tarde": ["Santuario Yushima Tenmangu (Ciruelos en flor)", "Parque Ueno"],
+                    "Noche": ["Tokyo Skytree (Opcional)", "Cena Tempura en Asakusa"]
+                }
+            },
+            {
+                d: "28", m: "FEB", loc: "Tokyo", img: imgDB.meiji,
+                title: "Relax & Carbo-Loading",
+                transportCost: "¥800",
+                transportHours: "~1h",
+                desc: "Día previo a la carrera. Cero estrés. Comer bien.",
+                blocks: {
+                    "Mañana": ["Santuario Meiji Jingu (Bosque)", "Ver entrada Takeshita St (Sin entrar)"],
+                    "Tarde": ["Omotesando (Arquitectura)", "Comer Pasta/Arroz (Carbohidratos)"],
+                    "Noche": ["Preparar ropa carrera", "Dormir temprano"]
+                }
+            },
+            {
+                d: "01", m: "MAR", loc: "Tokyo", img: imgDB.marathon,
+                title: "¡EL MARATÓN! + Amigo",
+                transportCost: "¥800",
+                transportHours: "~1h",
+                desc: "La carrera por la mañana. <strong>Tu amigo llega hoy</strong>.",
+                blocks: {
+                    "Mañana": ["Salida: Ayuntamiento Shinjuku", "Carrera por Tokyo"],
+                    "Tarde": ["Meta: Estación de Tokyo", "Baño caliente / Recuperación", "Recogida Amigo Hotel"],
+                    "Noche": ["Cena de Celebración (Izakaya)", "Brindis"]
+                }
+            },
+            {
+                d: "02", m: "MAR", loc: "Tokyo", img: tPlan.img,
+                title: tPlan.title,
+                transportCost: tPlan.transportCost,
+                transportHours: tPlan.transportHours,
+                desc: "Primer día completo con tu amigo. Plan seleccionado: " + currentMood.toUpperCase(),
+                blocks: {
+                    "Mañana": tPlan.morning,
+                    "Tarde": tPlan.afternoon,
+                    "Noche": tPlan.night
+                }
+            },
+            {
+                d: "03", m: "MAR", loc: "Hakone", img: imgDB.hakone,
+                title: "Escapada Termal Hakone",
+                transportCost: "¥1500",
+                transportHours: "~2h",
+                travelInfo: { from: "Tokyo", to: "Hakone", mode: "🚆 Romancecar", duration: "1.5h", cost: "~¥2,500 p/p" },
+                desc: "Viaje en Romancecar. Relax total para tus piernas.",
+                blocks: {
+                    "Mañana": ["Tren Romancecar desde Shinjuku", "Hakone Yumoto (Pueblo)"],
+                    "Tarde": ["Valle Owakudani (Huevos Negros)", "Barco Pirata Lago Ashi", "Hakone Open Air Museum"],
+                    "Noche": ["Cena Kaiseki en Ryokan", "Onsen (Aguas termales)"]
+                }
+            },
+            {
+                d: "04", m: "MAR", loc: "Kyoto", img: imgDB.kyoto_icon,
+                title: "Shinkansen a Kyoto",
+                transportCost: "¥800",
+                transportHours: "~1h",
+                travelInfo: { from: "Hakone", to: "Kyoto", mode: "🚄 Shinkansen", duration: "2.5h", cost: "~¥13,000 p/p" },
+                desc: "Traslado a la antigua capital. Primer contacto nocturno.",
+                blocks: {
+                    "Mañana": ["Vistas Monte Fuji (si hay suerte)", "Tren Bala a Kyoto"],
+                    "Tarde": ["Check-in Kyoto", "Barrio de Higashiyama (Calles antiguas)"],
+                    "Noche": ["Callejón Pontocho", "Buscar Geishas en Gion"]
+                }
+            },
+            {
+                d: "05", m: "MAR", loc: "Kyoto", img: imgDB.fushimi,
+                title: "Torii Rojos & Agua Pura",
+                transportCost: "¥1200",
+                transportHours: "~2h",
+                desc: "Los clásicos absolutos de Kyoto.",
+                blocks: {
+                    "Mañana": ["Fushimi Inari Taisha (7:30 AM)", "Templo Tofuku-ji"],
+                    "Tarde": ["Kiyomizu-dera (Templo de madera)", "Cuesta Sannenzaka", "Parque Maruyama"],
+                    "Noche": ["Santuario Yasaka", "Cena Okonomiyaki"]
+                }
+            },
+            {
+                d: "06", m: "MAR", loc: "Kyoto", img: kPlan.img,
+                title: kPlan.title,
+                transportCost: kPlan.transportCost,
+                transportHours: kPlan.transportHours,
+                desc: "Kyoto a tu medida. Plan seleccionado: " + currentMood.toUpperCase(),
+                blocks: {
+                    "Mañana": kPlan.morning,
+                    "Tarde": kPlan.afternoon,
+                    "Noche": kPlan.night
+                }
+            },
+            {
+                d: "07", m: "MAR", loc: "Nara", img: imgDB.nara,
+                title: "Nara & Festival del Fuego",
+                transportCost: "¥1500",
+                transportHours: "~1h",
+                travelInfo: { from: "Kyoto", to: "Nara", mode: "🚆 Tren Local", duration: "45min" },
+                desc: "Ciervos y el evento único <strong>Omizutori</strong>.",
+                blocks: {
+                    "Mañana": ["Tren a Nara", "Parque de Nara (Ciervos)"],
+                    "Tarde": ["Templo Todai-ji (Gran Buda)", "Jardines Isuien"],
+                    "Noche": ["Nigatsu-do (Omizutori Fuego 19:00)", "Regreso a Kyoto/Osaka"]
+                }
+            },
+            {
+                d: "08", m: "MAR", loc: "Osaka", img: imgDB.arrival,
+                title: "Locura en Osaka",
+                transportCost: "¥1200",
+                transportHours: "~2h",
+                travelInfo: { from: "Kyoto", to: "Osaka", mode: "🚆 Tren Local", duration: "30min" },
+                desc: "Castillos, neones y despedida a lo grande.",
+                blocks: {
+                    "Mañana": ["Castillo de Osaka", "Edificio Umeda Sky"],
+                    "Tarde": ["Barrio Retro Shinsekai", "Torre Tsutenkaku", "Den Den Town (Otaku)"],
+                    "Noche": ["Dotonbori (Cartel Glico)", "Namba Parks"]
+                }
+            },
+             {
+                d: "09", m: "MAR", loc: "Osaka", img: imgDB.osaka,
+                title: "Último día en Osaka",
+                transportCost: "¥1000",
+                transportHours: "~1.5h",
+                desc: "Día libre para explorar los rincones que faltan y hacer compras.",
+                blocks: {
+                    "Mañana": ["Acuario Kaiyukan (uno de los más grandes)", "Noria Tempozan"],
+                    "Tarde": ["Calle comercial Shinsaibashi-suji", "America-mura (Moda juvenil)"],
+                    "Noche": ["Cena de despedida con Kushikatsu", "Paseo final por Dotonbori"]
+                }
+            },
+            {
+                d: "10", m: "MAR", loc: "Aeropuerto", img: imgDB.marathon,
+                title: "Sayonara Japón",
+                transportCost: "¥1500",
+                transportHours: "~1.5h",
+                desc: "Últimas compras y vuelo de regreso.",
+                blocks: {
+                    "Mañana": ["Daiso o Seria (Compras 100 yen)", "Recoger maletas", "Tren Haruka/Rapi:t al Aeropuerto (KIX)"],
+                    "Tarde": ["Vuelo de Salida"]
+                }
+            }
+        ];
+
+        let html = "";
+        schedule.forEach((day, index) => {
+            const dayId = `${day.m}_${day.d}`;
+
+            // Generar bloques de tiempo
+            let metaInfoHtml = "";
+            let travelHtml = "";
+            if (day.travelInfo) {
+                const travelCostHtml = day.travelInfo.cost ? ` (${day.travelInfo.cost})` : "";
+                travelHtml = `
+                    <div class="meta-item">
+                        Viaje: <span>${day.travelInfo.mode} ${day.travelInfo.from} → ${day.travelInfo.to} (${day.travelInfo.duration})${travelCostHtml}</span>
+                    </div>
+                `;
+            }
+            metaInfoHtml = `
+                <div class="day-meta-info">
+                    <div class="meta-item">Coste Transporte: <span>~${day.transportCost} p/p</span></div>
+                    <div class="meta-item">Transporte Local: <span>${day.transportHours}</span></div>
+                    ${travelHtml}
+                </div>`;
+
+            let blocksHtml = "";
+            for (const [time, activities] of Object.entries(day.blocks || {})) {
+                if(activities && activities.length > 0) {
+                    const linksHtml = activities.map(act => mapLink(act, day.loc)).join('');
+                    blocksHtml += `
+                        <div class="time-block">
+                            <span class="time-label">${time}</span>
+                            <div class="acts-container">${linksHtml}</div>
+                        </div>
+                    `;
+                }
+            }
+
+            const notesHtml = `
+                <div class="notes-container">
+                    <label>📝 Notas del Grupo</label>
+                    <div class="notes-list" id="notes-list-${dayId}"></div>
+                    <div class="add-note-form">
+                        <select class="note-user-select" id="note-user-${dayId}">
+                            <option>Victor</option><option>Belen</option><option>Irene</option><option>Felix</option>
+                        </select>
+                        <textarea id="note-input-${dayId}" class="notes-textarea" placeholder="Escribe una nueva nota..."></textarea>
+                        <button class="add-note-btn" onclick="addNote('${dayId}')">Añadir Nota</button>
+                    </div>
+                </div>
+            `;
+
+            html += `
+                <div class="day-card" style="animation-delay: ${index * 0.05}s">
+                    <div class="day-visual">
+                        <img src="${day.img}" loading="lazy" alt="${day.title}">
+                        <div class="date-float">
+                            <span class="df-num">${day.d}</span>
+                            <span class="df-mon">${day.m}</span>
+                        </div>
+                    </div>
+                    <div class="day-body">
+                        <div class="day-title-row">
+                            <h3>${day.title}</h3>
+                            <span class="city-badge">${day.loc}</span>
+                        </div>
+                        <p class="desc">${day.desc}</p>
+                        ${metaInfoHtml}
+                        ${blocksHtml}
+                        ${notesHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        feed.innerHTML = html;
+
+        // Ahora renderizamos las notas para cada día después de que el HTML esté en la página
+        schedule.forEach(day => renderNotes(`${day.m}_${day.d}`));
+    }
+
+    // Render inicial
+    startCountdown();
+    renderItinerary();
+
+</script>
+
+</body>
+</html>
