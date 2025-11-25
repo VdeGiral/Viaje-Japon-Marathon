@@ -650,12 +650,40 @@
 
     <script type="module">
         // --- FIREBASE CONFIGURATION ---
-        // IMPORTANTE: Reemplaza estos valores con los de tu proyecto de Firebase
-        // 1. Ve a console.firebase.google.com
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // TODO: Replace the following with your app's Firebase project configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAWcc_EPrVWoX-susZmJmIqqQzUC1O_JYk",
+            authDomain: "viaje-japon-db.firebaseapp.com",
+            projectId: "viaje-japon-db",
+            storageBucket: "viaje-japon-db.firebasestorage.app",
+            messagingSenderId: "100433242982",
+            appId: "1:100433242982:web:c10000309eba40cedff6a7"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make db available globally for the functions that need it
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+        window.query = query;
+        window.orderBy = orderBy;
+        window.onSnapshot = onSnapshot;
+        window.serverTimestamp = serverTimestamp;
+
         // --- BASE DE DATOS DE IMÁGENES ---
         const imgDB = {
             arrival: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=800&auto=format&fit=crop",
             asakusa: "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?q=80&w=800&auto=format&fit=crop",
+
             meiji: "https://images.unsplash.com/photo-1589463349208-9220675c5086?q=80&w=800&auto=format&fit=crop",
             marathon: "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?q=80&w=800&auto=format&fit=crop",
 
@@ -679,12 +707,10 @@
             kyoto_temple: "https://images.unsplash.com/photo-1605218458283-0c5cb6d02c47?q=80&w=800&auto=format&fit=crop",
             kyoto_otaku: "https://images.unsplash.com/photo-1611905801936-599f3880d1b1?q=80&w=800&auto=format&fit=crop",
             kyoto_art: "https://images.unsplash.com/photo-1588523999964-43b51b3816d3?q=80&w=800&auto=format&fit=crop",
-
-            nara: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Omizutori_1.jpg/800px-Omizutori_1.jpg",
-            osaka: "https://images.unsplash.com/photo-1590559899731-a382839e5549?q=80&w=800&auto=format&fit=crop"
         };
 
         // --- CONTENIDO DINÁMICO ---
+        let currentMood = 'relax';
         const dynamicPlans = {
             relax: {
                 tokyo: {
@@ -840,10 +866,10 @@
             const query = encodeURIComponent(`${place} ${city} Japan`);
             const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
             return `
-            <a href="${url}" target="_blank" class="map-link">
-                <span><span class="icon-map">📍</span> ${place}</span>
-                <span class="arrow-icon">›</span>
-            </a>
+        <a href="${url}" target="_blank" class="map-link">
+            <span><span class="icon-map">📍</span> ${place}</span>
+            <span class="arrow-icon">›</span>
+        </a>
         `;
         }
 
@@ -927,15 +953,15 @@
                 const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                 return `
-                <div class="note-item ${isMe ? 'is-me' : ''}">
-                    <div class="note-header">
-                        <span class="note-author author-${note.author}">${note.author}</span>
-                        <span class="note-time">${timeStr}</span>
-                        ${isMe ? `<button class="delete-btn" onclick="deleteNote('${note.id}')">×</button>` : ''}
-                    </div>
-                    <p class="note-text">${note.text}</p>
-                </div>
-            `;
+        <div class="note-item ${isMe ? 'is-me' : ''}">
+            <div class="note-header">
+                <span class="note-author author-${note.author}">${note.author}</span>
+                <span class="note-time">${timeStr}</span>
+                ${isMe ? `<button class="delete-btn" onclick="deleteNote('${note.id}')">×</button>` : ''}
+            </div>
+            <p class="note-text">${note.text}</p>
+        </div>
+        `;
             }).join('');
 
             // Scroll al final
@@ -960,7 +986,7 @@
                     blocks: {
                         "Mañana/Tarde (Llegada)": ["Llegada Haneda/Narita", "Taxi o Uber a Shinjuku (2-2-21 Kabukicho)", "Check-in Apartamento"],
                         "Tarde": ["Tokyo Big Sight (Expo Maratón)", "Explorar alrededores de Shinjuku"],
-                        "Noche": ["Cena en Omoide Yokocho ('Piss Alley')", "Vistas desde el Ayto. de Tokyo (Gratis)", "Paseo por Kabukicho (Godzilla Head)"]
+                        "Noche": ["Cena en Omoide Yokocho ('Piss Alley')", "Vistas desde el Ayto. de Tokyo (Gratis)", "Paseo por Kabukicho(Godzilla Head)"]
                     }
                 },
                 {
@@ -1122,70 +1148,74 @@
                 if (day.travelInfo) {
                     const travelCostHtml = day.travelInfo.cost ? ` (${day.travelInfo.cost})` : "";
                     travelHtml = `
-                    <div class="meta-item">
-                        Viaje: <span>${day.travelInfo.mode} ${day.travelInfo.from} → ${day.travelInfo.to} (${day.travelInfo.duration})${travelCostHtml}</span>
-                    </div>
-                `;
+            <div class="meta-item">
+                Viaje: <span>${day.travelInfo.mode} ${day.travelInfo.from} → ${day.travelInfo.to}
+                    (${day.travelInfo.duration})${travelCostHtml}</span>
+            </div>
+            `;
                 }
                 metaInfoHtml = `
-                <div class="day-meta-info">
-                    <div class="meta-item">Coste Transporte: <span>~${day.transportCost} p/p</span></div>
-                    <div class="meta-item">Transporte Local: <span>${day.transportHours}</span></div>
-                    ${travelHtml}
-                </div>`;
+            <div class="day-meta-info">
+                <div class="meta-item">Coste Transporte: <span>~${day.transportCost} p/p</span></div>
+                <div class="meta-item">Transporte Local: <span>${day.transportHours}</span></div>
+                ${travelHtml}
+            </div>`;
 
                 let blocksHtml = "";
                 for (const [time, activities] of Object.entries(day.blocks || {})) {
                     if (activities && activities.length > 0) {
                         const linksHtml = activities.map(act => mapLink(act, day.loc)).join('');
                         blocksHtml += `
-                        <div class="time-block">
-                            <span class="time-label">${time}</span>
-                            <div class="acts-container">${linksHtml}</div>
-                        </div>
-                    `;
+            <div class="time-block">
+                <span class="time-label">${time}</span>
+                <div class="acts-container">${linksHtml}</div>
+            </div>
+            `;
                     }
                 }
 
                 const notesHtml = `
-                <div class="notes-container">
-                    <label>📝 Notas del Grupo</label>
-                    <div class="notes-list" id="notes-list-${dayId}"></div>
-                    <div class="add-note-form">
-                        <select class="note-user-select" id="note-user-${dayId}" onchange="saveUserPreference(this)">
-                            <option value="Victor">Victor</option>
-                            <option value="Belen">Belen</option>
-                            <option value="Irene">Irene</option>
-                            <option value="Felix">Felix</option>
-                        </select>
-                        <textarea id="note-input-${dayId}" class="notes-textarea" placeholder="Escribe algo..." rows="1"></textarea>
-                        <button class="add-note-btn" onclick="addNote('${dayId}')">
-                            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-                        </button>
-                    </div>
+            <div class="notes-container">
+                <label>📝 Notas del Grupo</label>
+                <div class="notes-list" id="notes-list-${dayId}"></div>
+                <div class="add-note-form">
+                    <select class="note-user-select" id="note-user-${dayId}" onchange="saveUserPreference(this)">
+                        <option value="Victor">Victor</option>
+                        <option value="Belen">Belen</option>
+                        <option value="Irene">Irene</option>
+                        <option value="Felix">Felix</option>
+                    </select>
+                    <textarea id="note-input-${dayId}" class="notes-textarea" placeholder="Escribe algo..."
+                        rows="1"></textarea>
+                    <button class="add-note-btn" onclick="addNote('${dayId}')">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                        </svg>
+                    </button>
                 </div>
+            </div>
             `;
 
                 html += `
-                <div class="day-card" style="animation-delay: ${index * 0.05}s">
-                    <div class="day-visual">
-                        <img src="${day.img}" loading="lazy" alt="${day.title}">
-                        <div class="date-float">
-                            <span class="df-num">${day.d}</span>
-                            <span class="df-mon">${day.m}</span>
-                        </div>
-                    </div>
-                    <div class="day-body">
-                        <div class="day-title-row">
-                            <h3>${day.title}</h3>
-                            <span class="city-badge">${day.loc}</span>
-                        </div>
-                        <p class="desc">${day.desc}</p>
-                        ${metaInfoHtml}
-                        ${blocksHtml}
-                        ${notesHtml}
+            <div class="day-card" style="animation-delay: ${index * 0.05}s">
+                <div class="day-visual">
+                    <img src="${day.img}" loading="lazy" alt="${day.title}">
+                    <div class="date-float">
+                        <span class="df-num">${day.d}</span>
+                        <span class="df-mon">${day.m}</span>
                     </div>
                 </div>
+                <div class="day-body">
+                    <div class="day-title-row">
+                        <h3>${day.title}</h3>
+                        <span class="city-badge">${day.loc}</span>
+                    </div>
+                    <p class="desc">${day.desc}</p>
+                    ${metaInfoHtml}
+                    ${blocksHtml}
+                    ${notesHtml}
+                </div>
+            </div>
             `;
             });
 
@@ -1200,14 +1230,14 @@
                     });
                 }
             }, 100);
-
-            // Iniciar suscripción a notas (si Firebase está activo)
-            if (typeof subscribeToNotes === 'function') subscribeToNotes();
         }
 
         // Render inicial
         startCountdown();
         renderItinerary();
+
+        // Iniciar suscripción a notas (si Firebase está activo)
+        if (typeof subscribeToNotes === 'function') subscribeToNotes();
 
     </script>
 
