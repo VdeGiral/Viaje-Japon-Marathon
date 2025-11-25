@@ -856,121 +856,6 @@
 
         window.changeMood = function (mood, el) {
             currentMood = mood;
-            document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
-            el.classList.add('active');
-            renderItinerary();
-        }
-
-        // Función para generar Link de Google Maps
-        function mapLink(place, city) {
-            const query = encodeURIComponent(`${place} ${city} Japan`);
-            const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
-            return `
-        <a href="${url}" target="_blank" class="map-link">
-            <span><span class="icon-map">📍</span> ${place}</span>
-            <span class="arrow-icon">›</span>
-        </a>
-        `;
-        }
-
-        // --- GESTIÓN DE NOTAS (FIREBASE) ---
-
-        // Guardar usuario seleccionado
-        window.saveUserPreference = function (select) {
-            localStorage.setItem('chatUser', select.value);
-        }
-
-        // Función global para añadir nota (necesaria porque type="module" aísla el scope)
-        window.addNote = async function (dayId) {
-            if (!db) {
-                alert("⚠️ Firebase no está configurado. Edita el archivo HTML y añade tus claves de Firebase.");
-                return;
-            }
-
-            const userSelect = document.getElementById(`note-user-${dayId}`);
-            const textarea = document.getElementById(`note-input-${dayId}`);
-            const author = userSelect.value;
-            const text = textarea.value.trim();
-
-            if (!text) return;
-
-            try {
-                await addDoc(collection(db, "notes"), {
-                    dayId: dayId,
-                    author: author,
-                    text: text,
-                    createdAt: serverTimestamp()
-                });
-                textarea.value = ''; // Limpiar
-                textarea.style.height = 'auto'; // Reset altura
-            } catch (e) {
-                console.error("Error añadiendo nota: ", e);
-                alert("Error al enviar el mensaje.");
-            }
-        }
-
-        // Función global para borrar nota
-        window.deleteNote = async function (noteId) {
-            if (!confirm("¿Borrar este mensaje?")) return;
-            try {
-                await deleteDoc(doc(db, "notes", noteId));
-            } catch (e) {
-                console.error("Error borrando nota: ", e);
-            }
-        }
-
-        // Escuchar cambios en tiempo real
-        function subscribeToNotes() {
-            if (!db) return;
-
-            const q = query(collection(db, "notes"), orderBy("createdAt", "asc"));
-
-            onSnapshot(q, (snapshot) => {
-                // Agrupar notas por día
-                const notesByDay = {};
-
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if (!notesByDay[data.dayId]) notesByDay[data.dayId] = [];
-                    notesByDay[data.dayId].push({ id: doc.id, ...data });
-                });
-
-                // Renderizar cada día
-                document.querySelectorAll('.notes-list').forEach(list => {
-                    const dayId = list.id.replace('notes-list-', '');
-                    const dayNotes = notesByDay[dayId] || [];
-                    renderNotesList(list, dayNotes);
-                });
-            });
-        }
-
-        function renderNotesList(container, notes) {
-            const currentUser = localStorage.getItem('chatUser') || 'Victor';
-
-            container.innerHTML = notes.map(note => {
-                const isMe = note.author === currentUser;
-                const date = note.createdAt ? note.createdAt.toDate() : new Date();
-                const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                return `
-        <div class="note-item ${isMe ? 'is-me' : ''}">
-            <div class="note-header">
-                <span class="note-author author-${note.author}">${note.author}</span>
-                <span class="note-time">${timeStr}</span>
-                ${isMe ? `<button class="delete-btn" onclick="deleteNote('${note.id}')">×</button>` : ''}
-            </div>
-            <p class="note-text">${note.text}</p>
-        </div>
-        `;
-            }).join('');
-
-            // Scroll al final
-            container.scrollTop = container.scrollHeight;
-        }
-
-
-
-        function renderItinerary() {
             const feed = document.getElementById('itinerary-feed');
             const tPlan = dynamicPlans[currentMood].tokyo;
             const kPlan = dynamicPlans[currentMood].kyoto;
@@ -1140,7 +1025,7 @@
 
             let html = "";
             schedule.forEach((day, index) => {
-                const dayId = `${day.m}_${day.d}`;
+                const dayId = `${day.m}_${day.d} `;
 
                 // Generar bloques de tiempo
                 let metaInfoHtml = "";
@@ -1148,34 +1033,34 @@
                 if (day.travelInfo) {
                     const travelCostHtml = day.travelInfo.cost ? ` (${day.travelInfo.cost})` : "";
                     travelHtml = `
-            <div class="meta-item">
-                Viaje: <span>${day.travelInfo.mode} ${day.travelInfo.from} → ${day.travelInfo.to}
-                    (${day.travelInfo.duration})${travelCostHtml}</span>
-            </div>
-            `;
+                < div class="meta-item" >
+                    Viaje: <span>${day.travelInfo.mode} ${day.travelInfo.from} → ${day.travelInfo.to}
+                        (${day.travelInfo.duration})${travelCostHtml}</span>
+            </div >
+                `;
                 }
                 metaInfoHtml = `
-            <div class="day-meta-info">
+                < div class="day-meta-info" >
                 <div class="meta-item">Coste Transporte: <span>~${day.transportCost} p/p</span></div>
                 <div class="meta-item">Transporte Local: <span>${day.transportHours}</span></div>
                 ${travelHtml}
-            </div>`;
+            </div > `;
 
                 let blocksHtml = "";
                 for (const [time, activities] of Object.entries(day.blocks || {})) {
                     if (activities && activities.length > 0) {
                         const linksHtml = activities.map(act => mapLink(act, day.loc)).join('');
                         blocksHtml += `
-            <div class="time-block">
+                < div class="time-block" >
                 <span class="time-label">${time}</span>
                 <div class="acts-container">${linksHtml}</div>
-            </div>
-            `;
+            </div >
+                `;
                     }
                 }
 
                 const notesHtml = `
-            <div class="notes-container">
+                < div class="notes-container" >
                 <label>📝 Notas del Grupo</label>
                 <div class="notes-list" id="notes-list-${dayId}"></div>
                 <div class="add-note-form">
@@ -1193,11 +1078,11 @@
                         </svg>
                     </button>
                 </div>
-            </div>
-            `;
+            </div >
+                `;
 
                 html += `
-            <div class="day-card" style="animation-delay: ${index * 0.05}s">
+                < div class="day-card" style = "animation-delay: ${index * 0.05}s" >
                 <div class="day-visual">
                     <img src="${day.img}" loading="lazy" alt="${day.title}">
                     <div class="date-float">
@@ -1215,7 +1100,7 @@
                     ${blocksHtml}
                     ${notesHtml}
                 </div>
-            </div>
+            </div >
             `;
             });
 
