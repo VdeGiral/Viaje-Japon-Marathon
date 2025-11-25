@@ -652,62 +652,6 @@
         // --- FIREBASE CONFIGURATION ---
         // IMPORTANTE: Reemplaza estos valores con los de tu proyecto de Firebase
         // 1. Ve a console.firebase.google.com
-        // 2. Crea un proyecto
-        // 3. Añade una Web App
-        // 4. Copia la configuración aquí
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAWcc_EPrVWoX-susZmJmIqqQzUC1O_JYk",
-            authDomain: "viaje-japon-db.firebaseapp.com",
-            projectId: "viaje-japon-db",
-            storageBucket: "viaje-japon-db.firebasestorage.app",
-            messagingSenderId: "100433242982",
-            appId: "1:100433242982:web:c10000309eba40cedff6a7"
-        };
-
-        let db;
-        try {
-            if (firebaseConfig.apiKey !== "AIzaSyAWcc_EPrVWoX-susZmJmIqqQzUC1O_JYk") {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                console.log("Firebase conectado correctamente");
-            } else {
-                console.warn("Firebase no configurado. Las notas no se guardarán en la nube.");
-            }
-        } catch (e) {
-            console.error("Error inicializando Firebase:", e);
-        }
-
-        // --- COUNTDOWN TIMER ---
-        function startCountdown() {
-            const countdownEl = document.getElementById('countdown');
-            const tripStartDate = new Date('2026-02-25T00:00:00').getTime();
-
-            const updateTimer = () => {
-                const now = new Date().getTime();
-                const distance = tripStartDate - now;
-
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                countdownEl.innerHTML = `
-                <div class="countdown-item">${days}<span>Días</span></div>
-                <div class="countdown-item">${hours}<span>Horas</span></div>
-                <div class="countdown-item">${minutes}<span>Min</span></div>
-                <div class="countdown-item">${seconds}<span>Seg</span></div>
-            `;
-            };
-            updateTimer(); // Initial call
-            setInterval(updateTimer, 1000);
-        }
-
-        // ESTADO INICIAL
-        let currentMood = 'relax';
-
         // --- BASE DE DATOS DE IMÁGENES ---
         const imgDB = {
             arrival: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=800&auto=format&fit=crop",
